@@ -26,4 +26,5 @@ public class DockerFile {
     public DockerFile(String fileUrl) {
         this.fileUrl = fileUrl;
     }
+    public DockerFile(){}
 }

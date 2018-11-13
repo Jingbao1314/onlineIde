@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 public class StopDocker {
     public static void stop(Data data) throws IOException, InterruptedException {
         Process process=Runtime.getRuntime().exec(new String[]
-                {"/home/jingbao/桌面/dockerStop.sh",
+                {"/home/jingbao/桌面/shell/dockerStop.sh",
                         data.getDockerId()},null,null);
         BufferedReader read=new BufferedReader(new InputStreamReader(process
                 .getInputStream()));
