@@ -140,11 +140,11 @@ public class MyWebSocketServerHandler extends
 //		System.out.println("---------------------------------------------end");
 
 //		ctx.channel().write(tws);
-//		ctx.channel().flush();
+//		ctx.channel().();
 //		Data data=new Gson().fromJson(request, Data.class);
 //		Status s= SaveProject.saveProject(data);
 //		Status s= new Status();
-//		s.setStatus("XXXX");
+//		s.setStatus("XXXX")flush;
 //		TimeUnit.SECONDS.sleep(5);
 //		TextWebSocketFrame x = new TextWebSocketFrame(new Gson().toJson(s));
 //		ctx.channel().writeAndFlush(x);

@@ -8,10 +8,7 @@ import pojo.Status;
 import utils.CustomSystemUtil;
 import utils.RedisOperating;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 
 /**
@@ -37,8 +34,9 @@ public class Run {
             path="/home/"+data.getMac()+path;
             status=run(path,data);
         }else {
-//            String debugPath="/home/"+data.getMac()+"/debug"+path;
-//            status=debug(path,data,lineNum,debugPath);//"/home/"+data.getMac()
+            String debugPath="/home/jingbao/桌面/"+data.getMac()+"/debug"+path;
+            path="/home/debug"+path;
+            status=debug(path,data,lineNum,debugPath);//"/home/"+data.getMac()
             // +path
         }
 
@@ -50,22 +48,33 @@ public class Run {
             throws
             IOException, InterruptedException {
         Status status=new Status();
-        addPoint(path,lineNum);
-        DebugRunable runable=new DebugRunable(path,data);
+        addPoint(path,lineNum,debugPath);
+        DebugRunable runable=new DebugRunable(path,data);///home/jingbao/桌面/MAC/xxx.py
         WorkThreadPool.doWork(runable);
         RedisOperating op=new RedisOperating();
-        String port=op.get(data.getMac()+"_port");
-
+        String port="7777";//op.get(data.getMac()+"_port")
         status.setStatus("1");
         status.setData("http://"+ CustomSystemUtil.INTRANET_IP+":"+port);
         return status;
     }
 
-    public static void addPoint(String path,String lineNum){
+    public static void addPoint(String path,String lineNum,String debug){
+        exitFile(debug);
 
 
 
 
+
+    }
+    public static void exitFile(String path){
+        File file=new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -92,15 +101,14 @@ public class Run {
             reader = new BufferedReader(new InputStreamReader(error));
             status.setStatus("0");
         }
-        String result="";
+        StringBuffer result=new StringBuffer();
         String line="";
         while ((line=reader.readLine())!=null){
-            result+=line+"\n";
+            result.append(line+"\n");
         }
-        status.setData(result);
+        status.setData(result.toString());
         System.out.println("Run ok--------------------------------------"+result);
         return status;
-
     }
 
     public static void main(String[] args) {

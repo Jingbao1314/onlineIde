@@ -36,11 +36,11 @@ public class SaveProject {
             for (int i=0;i<list.length;i++) {
                 filesList[i]=list[i].getFileUrl();
             }
-//            RedisOperating op=new RedisOperating();
-//            if (op.exists(data.getMac())){
-//            }else {
-//                createDocker(data);
-//            }
+            RedisOperating op=new RedisOperating();
+            if (op.exists(data.getMac())){
+            }else {
+                createDocker(data);
+            }
             for (String str:filesList) {
                 status=save("/home/jingbao/桌面/"+data.getMac()+str,"");
             }

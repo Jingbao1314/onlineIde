@@ -40,9 +40,9 @@ public class StartDocker {
         RedisOperating operating=new RedisOperating();
         if (data.getDockerId()==null||data.equals("")){
             Process process=Runtime.getRuntime().exec(new String[]
-                    {"/home/jingbao/桌面/shell/startDocker.sh",
+                    {"/home/jingbao/桌面/shell/startDocker.sh","7777",
                             "/home/jingbao/桌面/"+data.getMac(),
-                            "/data"},null,null);
+                            "/home"},null,null);
             BufferedReader read=new BufferedReader(new InputStreamReader(process
                     .getInputStream()));
             process.waitFor();
