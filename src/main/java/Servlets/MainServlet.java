@@ -8,6 +8,9 @@ import contrual.SaveProject;
 import pojo.Data;
 import pojo.Status;
 import utils.RedisOperating;
+
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -58,7 +61,17 @@ public class MainServlet {
         return status;
 
     }
-
+    public static void exitFile(String path){
+        System.out.println(path+"--+-+-+-+++++++++++++++++++++++++++++++++++");
+        File file=new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public static void main(String[] args) {
         RedisOperating operating=new RedisOperating();
         operating.del("MacTest");
