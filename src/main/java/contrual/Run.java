@@ -4,6 +4,7 @@ import Server.DebugRunable;
 import Server.WorkThreadPool;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import org.apache.log4j.Logger;
 import pojo.Data;
 import pojo.Status;
 import utils.AddPointUtil;
@@ -17,6 +18,7 @@ import java.io.*;
  * Created by jingbao on 18-11-12.
  */
 public class Run {
+    private static Logger log = Logger.getLogger(Run.class);
     public static Status doRun(Data data) throws IOException, InterruptedException {
         System.out.println
                 ("doRun---------------------------------------------------");

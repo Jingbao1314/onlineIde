@@ -1,5 +1,6 @@
 package contrual;
 
+import org.apache.log4j.Logger;
 import pojo.Data;
 import utils.RedisOperating;
 
@@ -31,6 +32,7 @@ public class StartDocker {
         createDocker(data);
 
     }
+    private static Logger log = Logger.getLogger(StartDocker.class);
 
     public static void createDocker(Data data) throws IOException, InterruptedException {
         File file=new File("/home/jingbao/桌面/"+data.getMac());

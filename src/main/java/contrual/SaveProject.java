@@ -4,6 +4,7 @@ import Server.WorkThreadPool;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.google.gson.Gson;
+import org.apache.log4j.Logger;
 import pojo.Data;
 import pojo.DockerFile;
 import pojo.Status;
@@ -21,6 +22,7 @@ import static contrual.StartDocker.createDocker;
  * Created by jingbao on 18-11-6.
  */
 public class SaveProject {
+    private static Logger log = Logger.getLogger(SaveProject.class);
     public SaveProject(){}
     public static Status doSave(Data data) throws IOException,
             InterruptedException {
