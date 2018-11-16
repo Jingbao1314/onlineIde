@@ -1,8 +1,5 @@
 package contrual;
 
-import Server.WorkThreadPool;
-import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.model.GetObjectRequest;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import pojo.Data;
@@ -11,10 +8,8 @@ import pojo.Status;
 import utils.OssUtil;
 import utils.RedisOperating;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import static contrual.StartDocker.createDocker;
 
@@ -39,10 +34,10 @@ public class SaveProject {
                 filesList[i]=list[i].getFileUrl();
             }
             RedisOperating op=new RedisOperating();
-            if (op.exists(data.getMac())){
-            }else {
-                createDocker(data);
-            }
+//            if (op.exists(data.getMac())){
+//            }else {
+//                createDocker(data);
+//            }
             for (String str:filesList) {
                 status=save("/home/jingbao/桌面/"+data.getMac()+str,"");
             }

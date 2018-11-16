@@ -2,6 +2,7 @@ package contrual;
 
 import org.apache.log4j.Logger;
 import pojo.Data;
+import pojo.Status;
 import utils.RedisOperating;
 
 import java.io.BufferedReader;
@@ -34,7 +35,26 @@ public class StartDocker {
     }
     private static Logger log = Logger.getLogger(StartDocker.class);
 
-    public static void createDocker(Data data) throws IOException, InterruptedException {
+
+    public static String exitDocker(Data data){
+        String dockerId="";
+        RedisOperating op=new RedisOperating();
+        if (op.exists(data.getMac()+"_docker")){
+            dockerId=op.get(data.getMac()+"_docker");
+        }else {
+            try {
+                dockerId=createDocker(data).getDockerId();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return dockerId;
+
+    }
+    public static Data createDocker(Data data) throws IOException, InterruptedException {
         File file=new File("/home/jingbao/桌面/"+data.getMac());
        if (!file.exists()){
            file.mkdir();
@@ -57,9 +77,10 @@ public class StartDocker {
             if (res==""||res.equals("")){
             }else {
                 String[] id=res.split("[  ]");
-                operating.set(data.getMac(),id[8]);
+                operating.set(data.getMac()+"_docker",id[8]);
                 data.setDockerId(id[8]);
             }
         }
+        return data;
     }
 }

@@ -59,7 +59,6 @@ public class MainServlet {
                 break;
         }
         return status;
-
     }
     public static void exitFile(String path){
         System.out.println(path+"--+-+-+-+++++++++++++++++++++++++++++++++++");
@@ -72,8 +71,9 @@ public class MainServlet {
             }
         }
     }
+
     public static void main(String[] args) {
         RedisOperating operating=new RedisOperating();
-        operating.del("MacTest");
+        operating.del("MAC");
     }
 }

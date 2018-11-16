@@ -1,7 +1,7 @@
 package contrual;
 
-import Server.DebugRunable;
-import Server.WorkThreadPool;
+import WorkerRunables.DebugRunable;
+import WorkerRunables.WorkThreadPool;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -27,7 +27,6 @@ public class Run {
         String path = json.getString("path");//主函数路径
         String alterPath = json.getString("alterList");//修改过的路径
         String lineNum=json.getString("lineNum");
-
         System.out.println(lineNum+"/*/*/*/-/*/*-/-*/*/*/*/*-/-*/*/-*-/*/*/*-");
         Data newData=new Data();
         newData.setDockerId(data.getDockerId());
@@ -35,7 +34,7 @@ public class Run {
         newData.setData(alterPath);
         SaveProject.doSave(newData);//-------------后期优化-----------------------
         if (lineNum==null){
-            path="/home/"+data.getMac()+path;
+            path="/home"+path;
             status=run(path,data);
         }else {
             String debugPath="/home/jingbao/桌面/"+data.getMac()+"/"+data.getMac()

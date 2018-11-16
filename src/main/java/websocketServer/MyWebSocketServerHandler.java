@@ -1,11 +1,10 @@
 package websocketServer;
 
 import RabbitServer.MessageConsume;
-import RabbitServer.MessageProduct;
-import Server.WorkRunable;
-import Server.WorkThreadPool;
+import WorkerRunables.CreateDockerRunable;
+import WorkerRunables.WorkRunable;
+import WorkerRunables.WorkThreadPool;
 import com.google.gson.Gson;
-import contrual.SaveProject;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -15,19 +14,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
-import pojo.Context;
 import pojo.Data;
-import pojo.Message;
 import pojo.Status;
 import utils.RedisOperating;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -116,18 +108,21 @@ public class MyWebSocketServerHandler extends
 						.fine(String.format("%s received %s", ctx.channel(),
 								request));
 			}
-			Status status=new Status();
-			status.setStatus("CONNECT OK");
-			TextWebSocketFrame tws = new TextWebSocketFrame(new Gson().toJson(status));
-			ctx.channel().write(tws);
-			ctx.channel().flush();
+//			Status status=new Status();
+//			status.setStatus("CONNECT OK");
+//			TextWebSocketFrame tws = new TextWebSocketFrame(new Gson().toJson(status));
+//			ctx.channel().write(tws);
+//			ctx.channel().flush();
 			Data data=new Gson().fromJson(request, Data.class);
 			MessageConsume messageConsum=new MessageConsume();
 			Global.map.put(data.getMac()+"_channel",ctx);
 			RedisOperating op=new RedisOperating();
-			op.set(Integer.toString(ctx.hashCode()),data.getMac()+"_channel");
+			op.set(data.getMac()+"_channel",Integer.toString(ctx.hashCode()));
 			messageConsum.setMac(data.getMac()+"_channel");
 			messageConsum.consume();
+			CreateDockerRunable dockerRunable=new CreateDockerRunable();
+			dockerRunable.setData(data);
+			WorkThreadPool.doWork(dockerRunable);
 		}
 //		Data data=new Gson().fromJson(request, Data.class);
 //		Global.map.put(data.getMac()+"_channel",ctx);

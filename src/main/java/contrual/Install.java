@@ -28,21 +28,21 @@ public class Install {
             // ps = Runtime.getRuntime().exec(new String[]{"这是传入的参数"});
             InputStream in = ps.getInputStream();
             InputStream error = ps.getErrorStream();
-            BufferedReader reader ;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(error));;
 
-            if(in.available() != 0){
-                status.setStatus("1");
-                reader = new BufferedReader(new InputStreamReader(in));
-            }else {
+            if(error.available() != 0){
                 status.setStatus("0");
-                reader = new BufferedReader(new InputStreamReader(error));
+            }else {
+                status.setStatus("1");
+                status.setData("install success");
+                return status;
             }
             StringBuffer result=new StringBuffer();
             String line="";
             while ((line=reader.readLine())!=null){
-                result.append(line+"\n");
+                result.append(line);
             }
-            status.setData(result.toString());
+            status.setData("install fail");
             System.out.println("这是返回值:"+result);
             reader.close();
         } catch (IOException e) {
