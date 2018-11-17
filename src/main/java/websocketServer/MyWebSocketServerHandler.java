@@ -1,6 +1,7 @@
 package websocketServer;
 
 import RabbitServer.MessageConsume;
+import RabbitServer.MessageProduct;
 import WorkerRunables.CreateDockerRunable;
 import WorkerRunables.WorkRunable;
 import WorkerRunables.WorkThreadPool;
@@ -114,15 +115,20 @@ public class MyWebSocketServerHandler extends
 //			ctx.channel().write(tws);
 //			ctx.channel().flush();
 			Data data=new Gson().fromJson(request, Data.class);
-			MessageConsume messageConsum=new MessageConsume();
-			Global.map.put(data.getMac()+"_channel",ctx);
-			RedisOperating op=new RedisOperating();
-			op.set(data.getMac()+"_channel",Integer.toString(ctx.hashCode()));
-			messageConsum.setMac(data.getMac()+"_channel");
-			messageConsum.consume();
-			CreateDockerRunable dockerRunable=new CreateDockerRunable();
-			dockerRunable.setData(data);
-			WorkThreadPool.doWork(dockerRunable);
+			if(data.getData().equals("Connection")){
+				MessageConsume messageConsum=new MessageConsume();
+				Global.map.put(data.getMac()+"_channel",ctx);
+				RedisOperating op=new RedisOperating();
+				op.set(data.getMac()+"_channel",Integer.toString(ctx.hashCode()));
+				messageConsum.setMac(data.getMac()+"_channel");
+				messageConsum.consume();
+				CreateDockerRunable dockerRunable=new CreateDockerRunable();
+				dockerRunable.setData(data);
+				WorkThreadPool.doWork(dockerRunable);
+			}else{
+				new MessageProduct().direct(data.getData(),data.getMac()
+						+"_input");
+			}
 		}
 //		Data data=new Gson().fromJson(request, Data.class);
 //		Global.map.put(data.getMac()+"_channel",ctx);

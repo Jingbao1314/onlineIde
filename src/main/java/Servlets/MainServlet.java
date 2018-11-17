@@ -74,6 +74,6 @@ public class MainServlet {
 
     public static void main(String[] args) {
         RedisOperating operating=new RedisOperating();
-        operating.del("MAC");
+        operating.del("MAC_docker");
     }
 }

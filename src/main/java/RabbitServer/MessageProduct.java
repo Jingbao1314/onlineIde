@@ -46,7 +46,8 @@ public class MessageProduct {
     }
 
     public static void main(String[] args) throws IOException {
-       new MessageProduct().direct("xxxxxxx","MacTest_channel");
-       new MessageProduct().direct("xxxxxxx","MacTest_channel");
+//       new MessageProduct().direct("xxxxxxx","MacTest_channel");
+//       new MessageProduct().direct("xxxxxxx","MacTest_channel");
+        new MessageProduct().direct("12345678","MAC_input");
     }
 }

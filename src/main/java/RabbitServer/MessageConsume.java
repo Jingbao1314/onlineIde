@@ -110,11 +110,6 @@ public class MessageConsume {
                 String msg = new String(body,"utf-8");
                 System.out.println("consume msg: "+msg+mac);
                 send(msg);
-                try {
-                    TimeUnit.MILLISECONDS.sleep((long) (Math.random()*500));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 //手动消息确认
                 getChannel().basicAck(envelope.getDeliveryTag(),false);
             }
