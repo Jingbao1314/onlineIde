@@ -3,7 +3,9 @@ package contrual;
 import RabbitServer.GlobalInput;
 import RabbitServer.InputConsume;
 import RabbitServer.MessageProduct;
+import Server.Server;
 import WorkerRunables.DebugRunable;
+import WorkerRunables.ProcessRunable;
 import WorkerRunables.WorkThreadPool;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
@@ -14,8 +16,10 @@ import utils.AddPointUtil;
 import utils.CustomSystemUtil;
 import utils.FileUtils;
 import utils.RedisOperating;
+import websocketServer.Global;
 
 import java.io.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +45,7 @@ public class Run {
         newData.setData(alterPath);
         SaveProject.doSave(newData);//-------------后期优化-----------------------
         if (lineNum==null){
-//            path="/home"+path;
+            path="/home"+path;
             status=run(path,data);
         }else {
             String debugPath="/home/jingbao/桌面/"+data.getMac()+"/"+data.getMac()
@@ -143,98 +147,118 @@ public class Run {
             IOException,
             InterruptedException, TimeoutException {
         Status status=new Status();
-       Boolean flag=exitInput(path,data.getMac());
-        path="/home"+path;
-       if (!flag){
-           Process pro = Runtime.getRuntime().exec(new
-                   String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
-                   path});//"/home/"+data.getMac()+path
-           pro.waitFor();
-           InputStream is = pro.getInputStream();
-           InputStream error = pro.getErrorStream();
-           BufferedReader reader ;
+        Process pro = Runtime.getRuntime().exec(new
+                String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
+                path});//"/home/"+data.getMac()+path
+        TimeUnit.SECONDS.sleep(1);
+//        pro.waitFor(1,TimeUnit.SECONDS);
+        BufferedReader reader=new BufferedReader(new InputStreamReader(pro
+                .getInputStream()));
+        if (pro.getErrorStream().available()!=0){
+            BufferedReader err=new BufferedReader(new InputStreamReader(pro
+                    .getErrorStream()));
+            StringBuffer result =new StringBuffer();
+            String line="";
+            while ((line=reader.readLine())!=null){
+                result.append(line+"\n");
+            }
+            status.setStatus("0");
+            status.setData(result.toString());
 
-           if(is.available() != 0){
-               reader = new BufferedReader(new InputStreamReader(is));
-               status.setStatus("1");
-           }else {
-               reader = new BufferedReader(new InputStreamReader(error));
-               status.setStatus("0");
-           }
-           StringBuffer result=new StringBuffer();
-           String line="";
-           while ((line=reader.readLine())!=null){
-               result.append(line+"\n");
-           }
-           status.setData(result.toString());
-           System.out.println("Run ok--------------------------------------"+result);
-       }else {
-           Process ps = Runtime.getRuntime().exec(new
-                   String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
-                   path});//"/home/"+data.getMac()+path
-
-           //读取标准输入流
-           BufferedWriter brOutput = new BufferedWriter(new OutputStreamWriter
-                   (ps.getOutputStream()));
-           GlobalInput.map.put(data.getMac()+"_input",brOutput);
-
-           InputConsume in=new InputConsume();
-           in.setOut(brOutput);
-           in.setMac_input(data.getMac()+"_input");
-           in.consume();
-
-           //读取标准输出流
-           BufferedReader brInput =new BufferedReader(new InputStreamReader(ps
-                   .getInputStream()));
-           String line = null;
-           Status input=new Status();
-           while ((line=brInput.readLine()) != null) {
-               System.out.println
-                       (line+"-*-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-//-/-");
-               input.setData(line);
-               input.setStatus("1");
-               new MessageProduct().direct(new Gson().toJson(input),data.getMac()
-                       +"_channel");
-
-
-           }
-
-           //读取标准错误流
-           BufferedReader brError = new BufferedReader(new InputStreamReader(ps
-                   .getErrorStream()));
-           String errline = null;
-           while ((errline = brError.readLine()) != null) {
-               System.out.println(errline);
-           }
-
-           int flags=ps.waitFor();
-           if(flags!=0){
-               System.out.println("程序异常终止.");
-           }
-
-
-       }
-        return status;
-    }
-
-
-
-    public static Boolean exitInput(String path,String mac){
-        Boolean flag=false;
-        String res=FileUtils.read("/home/jingbao/桌面/"+mac+path);
-        Pattern p=Pattern.compile("(input([^>]*))");
-        Matcher m=p.matcher(res);
-        System.out.println( m.groupCount());
-        if (m.find()){
-            flag=true;
         }
-        return flag;
-
-
+        StringBuffer result=new StringBuffer();
+        String line="";
+        int lineNum=1;
+        while ((line=reader.readLine())!=null&lineNum<500){
+            result.append(line+"\n");
+            lineNum++;
+            System.out.println
+                    (line+"*************************************************");
+        }
+        if(line!=null){
+            result.append(line+"\n");
+            System.out.println("NEW THREAD");
+            Server.process_map.put(data.getMac()+"_process",pro);
+            ProcessRunable processRunable=new ProcessRunable();
+            processRunable.setProcess(pro);
+            processRunable.setMac(data.getMac());
+            processRunable.setIn(reader);
+            WorkThreadPool.doWork(processRunable);
+        }
+        status.setData(result.toString());
+        System.out.println("Run ok--------------------------------------"+result);
+        return status;
+//       Boolean flag=exitInput(path,data.getMac());
+//
+//        path="/home"+path;
+//       if (!flag){
+//
+//       }else {
+//           Process ps = Runtime.getRuntime().exec(new
+//                   String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
+//                   path});//"/home/"+data.getMac()+path
+//
+//           //读取标准输入流
+//           BufferedWriter brOutput = new BufferedWriter(new OutputStreamWriter
+//                   (ps.getOutputStream()));
+//           GlobalInput.map.put(data.getMac()+"_input",brOutput);
+//
+//           InputConsume in=new InputConsume();
+//           in.setOut(brOutput);
+//           in.setMac_input(data.getMac()+"_input");
+//           in.consume();
+//
+//           //读取标准输出流
+//           BufferedReader brInput =new BufferedReader(new InputStreamReader(ps
+//                   .getInputStream()));
+//           String line = null;
+//           Status input=new Status();
+//           while ((line=brInput.readLine()) != null) {
+//               System.out.println
+//                       (line+"-*-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-//-/-");
+//               input.setData(line);
+//               input.setStatus("1");
+//               new MessageProduct().direct(new Gson().toJson(input),data.getMac()
+//                       +"_channel");
+//
+//
+//           }
+//
+//           //读取标准错误流
+//           BufferedReader brError = new BufferedReader(new InputStreamReader(ps
+//                   .getErrorStream()));
+//           String errline = null;
+//           while ((errline = brError.readLine()) != null) {
+//               System.out.println(errline);
+//           }
+//
+//           int flags=ps.waitFor();
+//           if(flags!=0){
+//               System.out.println("程序异常终止.");
+//           }
+//
+//
+//       }
     }
+
+
+
+//    public static Boolean exitInput(String path,String mac){
+//        Boolean flag=false;
+//        String res=FileUtils.read("/home/jingbao/桌面/"+mac+path);
+//        Pattern p=Pattern.compile("(input([^>]*))");
+//        Matcher m=p.matcher(res);
+//        System.out.println( m.groupCount());
+//        if (m.find()){
+//            flag=true;
+//        }
+//        return flag;
+//
+//
+//    }
 
     public static void main(String[] args) {
-        exitInput("","");
+//        exitInput("","");
 //        System.out.println("http://"+ CustomSystemUtil.INTRANET_IP+":"+7721);
 //        exitFile("/home/jingbao/桌面/MAC/MAC_debug/xxx.py");
 //        System.out.println(new Gson().fromJson("[\"1\",\"2\"]",String[]

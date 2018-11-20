@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 public class Global {
 	public static HashMap<String,ChannelHandlerContext> map=new HashMap<>();
-
 	public static ChannelGroup group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
 	

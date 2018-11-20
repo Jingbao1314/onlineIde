@@ -16,6 +16,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import org.apache.log4j.Logger;
 
 
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 
 /**
@@ -23,6 +24,8 @@ import java.util.concurrent.Executors;
  */
 public class Server {
     private static Logger log = Logger.getLogger(Server.class);
+    public static HashMap<String,Process> process_map=new
+            HashMap<>();
     public void startinbound(int port) throws Exception {
         EventLoopGroup bossGroup = new EpollEventLoopGroup(0x1, Executors.newCachedThreadPool()); //mainReactor    1个线程
         EventLoopGroup workerGroup = new EpollEventLoopGroup(Runtime.getRuntime().availableProcessors() * 0x3, Executors.newCachedThreadPool());   //subReactor       线程数量等价于cpu个数+1

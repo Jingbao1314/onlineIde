@@ -1,10 +1,7 @@
 package Servlets;
 
 
-import contrual.Install;
-import contrual.Open;
-import contrual.Run;
-import contrual.SaveProject;
+import contrual.*;
 import pojo.Data;
 import pojo.Status;
 import utils.RedisOperating;
@@ -56,6 +53,14 @@ public class MainServlet {
                 Open open= (Open) constructor.newInstance();
                 Method doOpen=cls.getMethod(urls[2], Data.class);
                 status= (Status) doOpen.invoke(open,data);
+                break;
+
+            case "Destory":
+                cls = Class.forName("contrual."+urls[1]);
+                constructor=cls.getConstructor();
+                Destory destory= (Destory) constructor.newInstance();
+                Method doDestory=cls.getMethod(urls[2], Data.class);
+                status= (Status) doDestory.invoke(destory,data);
                 break;
         }
         return status;
