@@ -38,15 +38,21 @@ public class Run {
         String path = json.getString("path");//主函数路径
         String alterPath = json.getString("alterList");//修改过的路径
         String lineNum=json.getString("lineNum");
-        System.out.println(lineNum+"/*/*/*/-/*/*-/-*/*/*/*/*-/-*/*/-*-/*/*/*-");
+        System.out.println(lineNum+"----------------------LINENUM------------");
         Data newData=new Data();
         newData.setDockerId(data.getDockerId());
         newData.setMac(data.getMac());
         newData.setData(alterPath);
         SaveProject.doSave(newData);//-------------后期优化-----------------------
         if (lineNum==null){
-            path="/home"+path;
-            status=run(path,data);
+            if(exitInput(path,data.getMac())){
+                path="/home/"+data.getMac()+"_input.py";
+                status=inputRun(path,data);
+            }else {
+                path="/home"+path;
+                status=run(path,data);
+            }
+
         }else {
             String debugPath="/home/jingbao/桌面/"+data.getMac()+"/"+data.getMac()
                     +"_debug"+path;
@@ -75,10 +81,6 @@ public class Run {
 
     public static void addPoint(String path,String lineNum,String debug) throws IOException {
         exitFile(debug);
-//        File fileReader=new File(path);
-//        FileInputStream in=new FileInputStream(fileReader);
-//        BufferedReader bufferedReader = new BufferedReader(new
-//                InputStreamReader(in));
         FileReader fileReader = new FileReader(path);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         String codeLine;
@@ -109,7 +111,7 @@ public class Run {
 
     }
     public static void exitFile(String path){
-        System.out.println(path+"--+-+-+-+++++++++++++++++++++++++++++++++++");
+        System.out.println(path+"-----------------------PATH-----------------");
         boolean flag=true;
         File file=new File(path);
         String filePath="/";
@@ -140,31 +142,29 @@ public class Run {
         }
     }
 
-
-
-
     public static Status run(String path,Data data) throws
             IOException,
             InterruptedException, TimeoutException {
         Status status=new Status();
-        Process pro = Runtime.getRuntime().exec(new
-                String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
-                path});//"/home/"+data.getMac()+path
-        TimeUnit.SECONDS.sleep(1);
-//        pro.waitFor(1,TimeUnit.SECONDS);
-        BufferedReader reader=new BufferedReader(new InputStreamReader(pro
-                .getInputStream()));
+        String run="docker exec "+data.getDockerId()+" python3.7 "+path;
+        Process pro = Runtime.getRuntime().exec(run);
         if (pro.getErrorStream().available()!=0){
             BufferedReader err=new BufferedReader(new InputStreamReader(pro
                     .getErrorStream()));
-            StringBuffer result =new StringBuffer();
-            String line="";
-            while ((line=reader.readLine())!=null){
-                result.append(line+"\n");
+            StringBuffer errorRes =new StringBuffer();
+            String errLine="";
+            while ((errLine=err.readLine())!=null){
+                errorRes.append(errLine+"\n");
             }
             status.setStatus("0");
-            status.setData(result.toString());
-
+            status.setData(errorRes.toString());
+            return status;
+        }
+        BufferedReader reader=new BufferedReader(new InputStreamReader(pro
+                .getInputStream()));
+        int flag=0;
+        while (flag==0){
+            flag=pro.getInputStream().available();
         }
         StringBuffer result=new StringBuffer();
         String line="";
@@ -172,8 +172,6 @@ public class Run {
         while ((line=reader.readLine())!=null&lineNum<500){
             result.append(line+"\n");
             lineNum++;
-            System.out.println
-                    (line+"*************************************************");
         }
         if(line!=null){
             result.append(line+"\n");
@@ -186,83 +184,112 @@ public class Run {
             WorkThreadPool.doWork(processRunable);
         }
         status.setData(result.toString());
+        status.setStatus("1");
         System.out.println("Run ok--------------------------------------"+result);
+//        if (pro.getErrorStream().available()!=0){
+//            BufferedReader err=new BufferedReader(new InputStreamReader(pro
+//                    .getErrorStream()));
+//            StringBuffer errorRes =new StringBuffer();
+//            String errLine="";
+//            while ((errLine=err.readLine())!=null){
+//                errorRes.append(errLine+"\n");
+//            }
+//            status.setStatus("0");
+//            status.setData(errorRes.toString());
+//        }
         return status;
-//       Boolean flag=exitInput(path,data.getMac());
-//
-//        path="/home"+path;
-//       if (!flag){
-//
-//       }else {
-//           Process ps = Runtime.getRuntime().exec(new
-//                   String[]{"/home/jingbao/桌面/shell/run.sh",data.getDockerId(),
-//                   path});//"/home/"+data.getMac()+path
-//
-//           //读取标准输入流
-//           BufferedWriter brOutput = new BufferedWriter(new OutputStreamWriter
-//                   (ps.getOutputStream()));
-//           GlobalInput.map.put(data.getMac()+"_input",brOutput);
-//
-//           InputConsume in=new InputConsume();
-//           in.setOut(brOutput);
-//           in.setMac_input(data.getMac()+"_input");
-//           in.consume();
-//
-//           //读取标准输出流
-//           BufferedReader brInput =new BufferedReader(new InputStreamReader(ps
-//                   .getInputStream()));
-//           String line = null;
-//           Status input=new Status();
-//           while ((line=brInput.readLine()) != null) {
-//               System.out.println
-//                       (line+"-*-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-//-/-");
-//               input.setData(line);
-//               input.setStatus("1");
-//               new MessageProduct().direct(new Gson().toJson(input),data.getMac()
-//                       +"_channel");
-//
-//
-//           }
-//
-//           //读取标准错误流
-//           BufferedReader brError = new BufferedReader(new InputStreamReader(ps
-//                   .getErrorStream()));
-//           String errline = null;
-//           while ((errline = brError.readLine()) != null) {
-//               System.out.println(errline);
-//           }
-//
-//           int flags=ps.waitFor();
-//           if(flags!=0){
-//               System.out.println("程序异常终止.");
-//           }
-//
-//
-//       }
     }
 
 
 
-//    public static Boolean exitInput(String path,String mac){
-//        Boolean flag=false;
-//        String res=FileUtils.read("/home/jingbao/桌面/"+mac+path);
-//        Pattern p=Pattern.compile("(input([^>]*))");
-//        Matcher m=p.matcher(res);
+
+
+
+
+    public static Boolean exitInput(String path,String mac){
+        String add="import sys\n" +
+                "temp=open('/home/jingbao_temp', 'r')\n" +
+                "sys.stdin=temp\n";
+        Boolean flag=false;
+        String res=FileUtils.read("/home/jingbao/桌面/"+mac+path);
+        Pattern p=Pattern.compile("(input([^>]*))");
+        Matcher m=p.matcher(res);
 //        System.out.println( m.groupCount());
-//        if (m.find()){
-//            flag=true;
-//        }
-//        return flag;
-//
-//
-//    }
+        if (m.find()){
+            flag=true;
+            res=add+res;
+            String input="/home/jingbao/桌面/"+mac+"/"+mac+"_input.py";
+            try {
+                boolean flag_add=FileUtils.write(input,res);
+                FileUtils.write("/home/jingbao/桌面/"+mac+"/jingbao_temp","");
+                File file=new File("/home/jingbao/桌面/"+mac+"/jingbao_temp");
+                if (!file.exists()){
+                    file.createNewFile();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return flag;
 
-    public static void main(String[] args) {
-//        exitInput("","");
-//        System.out.println("http://"+ CustomSystemUtil.INTRANET_IP+":"+7721);
-//        exitFile("/home/jingbao/桌面/MAC/MAC_debug/xxx.py");
-//        System.out.println(new Gson().fromJson("[\"1\",\"2\"]",String[]
-//                .class)[1]);
 
+    }
+
+    public static Status inputRun(String path,Data data) throws IOException {
+        Status status=new Status();
+        status.setStatus("1");
+        String sh="docker exec "+data.getDockerId()+" python3.7 "+path;
+        Process pro = Runtime.getRuntime().exec(sh);
+
+        if (pro.getErrorStream().available()!=0){
+            BufferedReader err=new BufferedReader(new InputStreamReader(pro
+                    .getErrorStream()));
+            StringBuffer errorRes =new StringBuffer();
+            String errLine="";
+            while ((errLine=err.readLine())!=null){
+                errorRes.append(errLine+"\n");
+            }
+            if (errorRes.toString().contains("EOF when reading a line")){
+                status.setStatus("2");
+            }else {
+                status.setStatus("0");
+                status.setData(errorRes.toString());
+                return status;
+            }
+        }
+        BufferedReader reader=new BufferedReader(new InputStreamReader(pro
+                .getInputStream()));
+        int flag=0;
+        while (flag==0){
+            flag=pro.getInputStream().available();
+        }
+        StringBuffer result=new StringBuffer();
+        String line="";
+        int lineNum=1;
+        while ((line=reader.readLine())!=null&lineNum<500){
+            result.append(line+"\n");
+            lineNum++;
+        }
+        if(line!=null){
+            result.append(line+"\n");
+            Server.process_map.put(data.getMac()+"_process",pro);
+            ProcessRunable processRunable=new ProcessRunable();
+            processRunable.setProcess(pro);
+            processRunable.setMac(data.getMac());
+            processRunable.setIn(reader);
+            WorkThreadPool.doWork(processRunable);
+        }
+        status.setData(result.toString());
+        System.out.println("inputRunok--------------------------------------"+result);
+        return status;
+
+    }
+
+    public static void main(String[] args) throws IOException {
+        String add="import sys\n" +
+                "temp=open('/home/jingbao_temp', 'r')\n" +
+                "sys.stdin=temp\n";
+        String input="/home/jingbao/桌面/MAC/MAC_input.py";
+        boolean flag_add=FileUtils.write(input,add);
     }
 }

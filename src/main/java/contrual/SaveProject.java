@@ -21,7 +21,7 @@ public class SaveProject {
     public SaveProject(){}
     public static Status doSave(Data data) throws IOException,
             InterruptedException {
-        System.out.println(new Gson().toJson(data));
+//        System.out.println(new Gson().toJson(data));
         Status status=null;
         String dcokerFile=data.getData();
         DockerFile[] list=new Gson().fromJson(dcokerFile,DockerFile[]

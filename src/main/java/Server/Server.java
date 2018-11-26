@@ -33,7 +33,7 @@ public class Server {
             ServerBootstrap b = new ServerBootstrap();
 //            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
             b.group(bossGroup, workerGroup).channel(EpollServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .childHandler(  new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             // server端发送的是httpResponse，所以要使用HttpResponseEncoder进行编码

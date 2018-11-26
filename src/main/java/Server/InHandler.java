@@ -14,11 +14,11 @@ public class InHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
         Message message=new Message();
-        System.out.println("read");
+//        System.out.println("read");
         try {
             FullHttpRequest fhr = (FullHttpRequest) msg;
-            System.out.println(fhr.headers().get("Cookies"));
-            System.out.println("请求的URL："+fhr.uri());
+//            System.out.println(fhr.headers().get("Cookies"));
+//            System.out.println("请求的URL："+fhr.uri());
             message.setUrl(fhr.uri());
 //            message.setFhr(fhr);
             ByteBuf buf = fhr.content();
@@ -26,10 +26,10 @@ public class InHandler extends ChannelInboundHandlerAdapter {
             byte[] result1 = new byte[buf.readableBytes()];
             buf.readBytes(result1);
             String data=new String(result1,"utf8");
-            System.out.println("读取的数据："+data);
+//            System.out.println("----------------------------读取的数据："+data);
             message.setData(data);
             ctx.write(message);
-            System.out.println("write");
+//            System.out.println("write");
         }catch (Exception e){
 
             e.printStackTrace();
