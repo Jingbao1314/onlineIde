@@ -26,7 +26,7 @@ public class InHandler extends ChannelInboundHandlerAdapter {
             byte[] result1 = new byte[buf.readableBytes()];
             buf.readBytes(result1);
             String data=new String(result1,"utf8");
-//            System.out.println("----------------------------读取的数据："+data);
+            System.out.println("----------------------------读取的数据："+data);
             message.setData(data);
             ctx.write(message);
 //            System.out.println("write");

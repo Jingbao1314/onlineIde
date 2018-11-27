@@ -146,6 +146,10 @@ public class Run {
             IOException,
             InterruptedException, TimeoutException {
         Status status=new Status();
+//        String projectName=data.getMac()+"_"+path.split("[/]")[2];
+//        RedisOperating op=new RedisOperating();
+//        String type=op.get(projectName);
+//        String run="docker exec "+data.getDockerId()+" "+type+" "+path;
         String run="docker exec "+data.getDockerId()+" python3.7 "+path;
         Process pro = Runtime.getRuntime().exec(run);
         if (pro.getErrorStream().available()!=0){

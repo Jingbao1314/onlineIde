@@ -62,6 +62,14 @@ public class MainServlet {
                 Method doDestory=cls.getMethod(urls[2], Data.class);
                 status= (Status) doDestory.invoke(destory,data);
                 break;
+
+            case "Create":
+                cls = Class.forName("contrual."+urls[1]);
+                constructor=cls.getConstructor();
+                Create create= (Create) constructor.newInstance();
+                Method doCreate=cls.getMethod(urls[2], Data.class);
+                status= (Status) doCreate.invoke(create,data);
+                break;
         }
         return status;
     }
