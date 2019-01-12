@@ -1,8 +1,10 @@
 package Servlets;
 
 
+import com.google.gson.Gson;
 import contrual.*;
 import pojo.Data;
+import pojo.Message;
 import pojo.Status;
 import utils.RedisOperating;
 
@@ -86,7 +88,9 @@ public class MainServlet {
     }
 
     public static void main(String[] args) {
-        RedisOperating operating=new RedisOperating();
-        operating.del("MAC_docker");
+        Message m=new Message();
+        m.setData("xxxx");
+        Gson gson=new Gson();
+        System.out.println(gson.toJson(m));
     }
 }

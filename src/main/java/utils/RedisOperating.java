@@ -211,4 +211,9 @@ public class RedisOperating {
         RedisUtils.returnResource(jedis);
 
     }
+
+    public static void main(String[] args) {
+        RedisOperating o=new RedisOperating();
+        o.del("Mac_channel");
+    }
 }

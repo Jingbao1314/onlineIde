@@ -39,7 +39,7 @@ public class SaveProject {
 //                createDocker(data);
 //            }
             for (String str:filesList) {
-                status=save("/home/jingbao/桌面/"+data.getMac()+str,"");
+                status=save("/home/jingbao/桌面/"+data.getMac()+"/"+str,"");
             }
             OssUtil.load(filesList,data.getMac());
         }

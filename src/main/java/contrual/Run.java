@@ -49,7 +49,7 @@ public class Run {
                 path="/home/"+data.getMac()+"_input.py";
                 status=inputRun(path,data);
             }else {
-                path="/home"+path;
+                path="/home"+"/"+path;
                 status=run(path,data);
             }
 
@@ -215,7 +215,7 @@ public class Run {
                 "temp=open('/home/jingbao_temp', 'r')\n" +
                 "sys.stdin=temp\n";
         Boolean flag=false;
-        String res=FileUtils.read("/home/jingbao/桌面/"+mac+path);
+        String res=FileUtils.read("/home/jingbao/桌面/"+mac+"/"+path);
         Pattern p=Pattern.compile("(input([^>]*))");
         Matcher m=p.matcher(res);
 //        System.out.println( m.groupCount());
