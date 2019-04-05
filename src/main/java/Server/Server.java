@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by jingbao on 18-6-23.
  */
-public class Server {
+public class Server {//https://blog.csdn.net/xiangzhihong8/article/details/52029446
     private static Logger log = Logger.getLogger(Server.class);
     public static HashMap<String,Process> process_map=new
             HashMap<>();

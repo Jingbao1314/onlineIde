@@ -19,6 +19,7 @@ import utils.RedisOperating;
 import websocketServer.Global;
 
 import java.io.*;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
@@ -289,11 +290,12 @@ public class Run {
 
     }
 
+
     public static void main(String[] args) throws IOException {
-        String add="import sys\n" +
-                "temp=open('/home/jingbao_temp', 'r')\n" +
-                "sys.stdin=temp\n";
-        String input="/home/jingbao/桌面/MAC/MAC_input.py";
-        boolean flag_add=FileUtils.write(input,add);
+//        String add="import sys\n" +
+//                "temp=open('/home/jingbao_temp', 'r')\n" +
+//                "sys.stdin=temp\n";
+//        String input="/home/jingbao/桌面/MAC/MAC_input.py";
+//        boolean flag_add=FileUtils.write(input,add);
     }
 }

@@ -2,6 +2,7 @@ package utils;
 
 import redis.clients.jedis.Jedis;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -168,11 +169,24 @@ public class RedisOperating {
     }
 
     public List<String> lrange(String key, long start, long end){
-        Jedis jedis = RedisUtils.getJedis();
+        Jedis jedis = RedisUtils.getJedis();//遍历列表
         List<String> str = jedis.lrange(key, start, end);
         RedisUtils.returnResource(jedis);
         return str;
     }
+
+    public void ltrim(String key,int start,int end){
+        Jedis jedis = RedisUtils.getJedis();
+        jedis.ltrim(key,start,end);//对列表进行裁剪
+        RedisUtils.returnResource(jedis);
+    }
+
+    public void lrem(String key,String value){//http://doc.redisfans.com/list/lrem.html
+        Jedis jedis = RedisUtils.getJedis();
+        jedis.lrem(key,0,value);//移除所有与value相同的数据
+        RedisUtils.returnResource(jedis);
+    }
+
     /*********************redis list操作结束**************************/
 
     /**
@@ -214,6 +228,21 @@ public class RedisOperating {
 
     public static void main(String[] args) {
         RedisOperating o=new RedisOperating();
-        o.del("Mac_channel");
+        int i=0;
+        while (i==0){
+            System.out.println("请输入技术名称");
+            String value=new Scanner(System.in).next();
+            if (value!=null){
+                o.lrem("list",value);
+                o.lpush("list",value);
+                o.ltrim("list",0,9);
+            }
+            System.out.println("是否继续,继续输入0");
+            i=new Scanner(System.in).nextInt();
+        }
+        for (String ele:o.lrange("list",0,9)) {
+            System.out.println(ele);
+
+        }
     }
 }
