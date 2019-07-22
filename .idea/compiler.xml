@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="nettyDemo" />
         <module name="webApi" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="nettyDemo" target="1.7" />
       <module name="webApi" target="1.7" />
     </bytecodeTargetLevel>
   </component>

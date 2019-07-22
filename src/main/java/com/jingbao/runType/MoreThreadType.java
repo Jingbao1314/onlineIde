@@ -1,5 +1,7 @@
-package Server;
+package com.jingbao.runType;
 
+import com.jingbao.handler.MyHandler;
+import com.jingbao.load.ServiceLoad;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -13,20 +15,25 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import org.apache.log4j.Logger;
 
-
-import java.util.HashMap;
 import java.util.concurrent.Executors;
 
 /**
- * Created by jingbao on 18-6-23.
+ * @author jijngbao
+ * @date 19-7-20
  */
-public class Server {//https://blog.csdn.net/xiangzhihong8/article/details/52029446
-    private static Logger log = Logger.getLogger(Server.class);
-    public static HashMap<String,Process> process_map=new
-            HashMap<>();
-    public void startinbound(int port) throws Exception {
+public class MoreThreadType implements NettyRun{
+    @Override
+    public void run(int port) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ServiceLoad.getClasssFromPackages();
+            }
+        }).start();
+
+
         EventLoopGroup bossGroup = new EpollEventLoopGroup(0x1, Executors.newCachedThreadPool()); //mainReactor    1个线程
         EventLoopGroup workerGroup = new EpollEventLoopGroup(Runtime.getRuntime().availableProcessors() * 0x3, Executors.newCachedThreadPool());   //subReactor       线程数量等价于cpu个数+1
         try {
@@ -42,8 +49,7 @@ public class Server {//https://blog.csdn.net/xiangzhihong8/article/details/52029
                             ch.pipeline().addLast(new HttpRequestDecoder());//有两次FIle操作
                             ch.pipeline().addLast(new HttpObjectAggregator(65535));//把上一句的两次File操作聚合在一起
                             ch.pipeline().addLast(new ChunkedWriteHandler());//Chunked是一种报文，处理后返回去，报文回去查一下
-                            ch.pipeline().addLast(new OutHandler());
-                            ch.pipeline().addLast(new InHandler());//如果上两句不写
+                            ch.pipeline().addLast(new MyHandler());//如果上两句不写
                             // 就会有两次File处理（一次头处理，一次体处理）
                         }
 
@@ -58,26 +64,11 @@ public class Server {//https://blog.csdn.net/xiangzhihong8/article/details/52029
             ChannelFuture f = b.bind(port).sync();
 
             f.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        Thread inbound=new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Server serverIn = new Server();
-                try {
-                    serverIn.startinbound(7721);
-                } catch (Exception e) {
-                    log.error("Inbound Server crash!!!",e);
-                    System.exit(1);
-                }
-            }
-        });
-        inbound.start();
-    }
-
 }
